@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import HealthIndicator from './HealthIndicator'
 
 function tabClass({ isActive }: { isActive: boolean }): string {
   return isActive ? 'nav-tabs__link nav-tabs__link--active' : 'nav-tabs__link'
@@ -21,6 +22,7 @@ export default function AppShell() {
               Free rooms
             </NavLink>
           </nav>
+          <HealthIndicator />
         </div>
       </header>
       <main className="app-content">

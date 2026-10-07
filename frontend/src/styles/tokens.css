@@ -162,6 +162,48 @@ body {
   border-bottom-color: var(--color-accent);
 }
 
+.health-pill {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-0);
+  height: 24px;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-pill);
+  font-size: var(--size-caption);
+  line-height: var(--line-caption);
+  font-weight: var(--label-weight);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.health-pill__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: currentColor;
+}
+
+.health-pill--ok {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.health-pill--db-unreachable {
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+}
+
+.health-pill--offline {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.health-pill--loading {
+  background: var(--color-surface-strong);
+  color: var(--color-muted);
+}
+
 .app-content {
   flex: 1;
   width: 100%;
