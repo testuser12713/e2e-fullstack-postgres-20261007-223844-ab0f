@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buchung bearbeiten — Raumbuchung</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
+        </span>
+        <span class="brand-name">Raumbuchung</span>
+      </a>
+      <nav class="navtabs" aria-label="Hauptnavigation">
+        <a class="navtab" href="index.html">Räume</a>
+        <a class="navtab is-active" href="day-view.html" aria-current="page">Tagesansicht</a>
+        <a class="navtab" href="free-rooms.html">Freie Räume</a>
+      </nav>
+      <div class="health" role="status" title="GET /api/health → {&quot;status&quot;:&quot;ok&quot;,&quot;database&quot;:&quot;ok&quot;}">
+        <span class="health-dot"></span>
+        <span class="health-label">API ok</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container page" data-od-id="booking-edit-screen">
+    <div class="page-head" data-od-id="booking-edit-head">
+      <a class="back-link" href="day-view.html?room=Konferenzraum%20Nord&date=2026-04-14">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+        Zurück zur Tagesansicht
+      </a>
+      <h1 class="page-title" data-od-id="booking-edit-title">Buchung bearbeiten</h1>
+      <p class="page-subtitle">Diese Buchung hat bereits begonnen.</p>
+    </div>
+
+    <div class="card form-card" data-od-id="booking-edit-card">
+      <div class="error-banner banner" role="note" data-od-id="booking-edit-notice">
+        <svg class="banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+        <div class="banner-body">
+          <div class="banner-title">Gestartete Buchungen können nicht mehr geändert werden</div>
+          <div class="banner-text">Diese Buchung hat bereits begonnen. Speichern und Löschen sind deshalb deaktiviert.</div>
+        </div>
+      </div>
+
+      <form>
+        <div class="field">
+          <label class="field-label" for="e-room">Raum</label>
+          <select class="select" id="e-room" disabled>
+            <option>Konferenzraum Nord</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="e-title">Titel</label>
+          <input class="input" id="e-title" type="text" value="Wöchentliches Stand-up" disabled>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="e-by">Gebucht von</label>
+          <input class="input" id="e-by" type="text" value="Anna Schmidt" disabled>
+        </div>
+
+        <div class="time-range-group">
+          <div class="field">
+            <label class="field-label" for="e-date">Datum</label>
+            <input class="input num" id="e-date" type="date" value="2026-04-14" disabled>
+          </div>
+          <div class="field">
+            <label class="field-label" for="e-start">Beginn</label>
+            <input class="input num" id="e-start" type="time" value="09:00" step="300" disabled>
+          </div>
+          <div class="field">
+            <label class="field-label" for="e-end">Ende</label>
+            <input class="input num" id="e-end" type="time" value="10:30" step="300" disabled>
+          </div>
+        </div>
+
+        <div class="row" style="justify-content: flex-end; gap: 8px; margin-top: 24px;">
+          <a class="btn btn-ghost" href="day-view.html?room=Konferenzraum%20Nord&date=2026-04-14">Abbrechen</a>
+          <button class="btn btn-danger" type="button" disabled title="Buchung hat bereits begonnen">Löschen</button>
+          <button class="btn btn-primary" type="button" disabled title="Buchung hat bereits begonnen">Speichern</button>
+        </div>
+        <p class="muted" style="font-size: var(--size-small); margin-top: 12px; text-align: right;">Speichern und Löschen sind deaktiviert, weil die Buchung bereits gestartet ist.</p>
+      </form>
+    </div>
+  </main>
+</body>
+</html>

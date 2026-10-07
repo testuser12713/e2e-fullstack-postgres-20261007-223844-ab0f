@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Räume — Raumbuchung</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
+        </span>
+        <span class="brand-name">Raumbuchung</span>
+      </a>
+      <nav class="navtabs" aria-label="Hauptnavigation">
+        <a class="navtab is-active" href="index.html" aria-current="page">Räume</a>
+        <a class="navtab" href="day-view.html">Tagesansicht</a>
+        <a class="navtab" href="free-rooms.html">Freie Räume</a>
+      </nav>
+      <div class="health" role="status" title="GET /api/health → {&quot;status&quot;:&quot;ok&quot;,&quot;database&quot;:&quot;ok&quot;}">
+        <span class="health-dot"></span>
+        <span class="health-label">API ok</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container page" data-od-id="rooms-screen">
+    <div class="page-head" data-od-id="rooms-head">
+      <h1 class="page-title" data-od-id="rooms-title">Räume</h1>
+      <p class="page-subtitle">Alle buchbaren Räume mit Ausstattung und Sitzplätzen.</p>
+    </div>
+
+    <div class="filter-row" role="group" aria-label="Ausstattung filtern" data-od-id="rooms-filters">
+      <button class="filter-chip" data-filter="Beamer" aria-pressed="false">
+        <span class="chip-check" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l3 3 7-7"/></svg>
+        </span>
+        Beamer
+      </button>
+      <button class="filter-chip" data-filter="Whiteboard" aria-pressed="false">
+        <span class="chip-check" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l3 3 7-7"/></svg>
+        </span>
+        Whiteboard
+      </button>
+      <button class="filter-chip" data-filter="Videokonferenz" aria-pressed="false">
+        <span class="chip-check" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l3 3 7-7"/></svg>
+        </span>
+        Videokonferenz
+      </button>
+      <button class="filter-chip" data-filter="Flipchart" aria-pressed="false">
+        <span class="chip-check" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l3 3 7-7"/></svg>
+        </span>
+        Flipchart
+      </button>
+      <div class="seats-filter">
+        <label class="seats-label" for="min-seats">Mindestplätze</label>
+        <input class="input num" id="min-seats" type="number" min="1" step="1" placeholder="—" inputmode="numeric">
+        <span class="seats-readout" id="seats-readout" hidden>≥ 1 Platz</span>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="clear-filters" hidden>Filter zurücksetzen</button>
+    </div>
+
+    <div class="room-grid" id="room-grid" aria-live="polite" aria-busy="false" data-od-id="room-grid"></div>
+
+    <div class="empty-state" id="empty-state" hidden data-od-id="rooms-empty">
+      <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+      <div class="empty-title">Keine Räume für diese Filter</div>
+      <div class="empty-text">Versuche, einen Filter zu entfernen.</div>
+      <div class="empty-action"><button class="btn btn-secondary btn-sm" id="empty-clear">Filter zurücksetzen</button></div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var ROOMS = [
+        { name: 'Konferenzraum Nord', seats: 8, equipment: ['Beamer', 'Whiteboard', 'Videokonferenz'] },
+        { name: 'Besprechung Mitte', seats: 4, equipment: ['Whiteboard', 'Videokonferenz'] },
+        { name: 'Fokusraum A', seats: 2, equipment: [] },
+        { name: 'Kreativ-Lounge', seats: 10, equipment: ['Beamer', 'Flipchart', 'Videokonferenz'] },
+        { name: 'Fokusraum B', seats: 2, equipment: [] },
+        { name: 'Telefonzelle 1', seats: 1, equipment: [] }
+      ];
+
+      var selected = {};
+      var minSeats = null;
+
+      var grid = document.getElementById('room-grid');
+      var emptyState = document.getElementById('empty-state');
+      var clearBtn = document.getElementById('clear-filters');
+      var emptyClearBtn = document.getElementById('empty-clear');
+      var seatsInput = document.getElementById('min-seats');
+      var seatsReadout = document.getElementById('seats-readout');
+
+      var CHECK_ICON = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l3 3 7-7"/></svg>';
+      var SEAT_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/></svg>';
+
+      function cardClickable(id) {
+        var card = document.getElementById(id);
+        if (window.matchMedia('(min-width: 768px)').matches) {
+          card.setAttribute('tabindex', '0');
+          card.classList.add('clickable');
+          card.addEventListener('click', function (e) {
+            if (e.target.closest('button, a')) return;
+            window.location.href = 'day-view.html?room=' + encodeURIComponent(card.getAttribute('data-room'));
+          });
+          card.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              window.location.href = 'day-view.html?room=' + encodeURIComponent(card.getAttribute('data-room'));
+            }
+          });
+        }
+      }
+
+      function render() {
+        var chips = Array.prototype.slice.call(document.querySelectorAll('.filter-chip'));
+        chips.forEach(function (c) { c.classList.remove('is-selected'); c.setAttribute('aria-pressed', 'false'); });
+        Object.keys(selected).forEach(function (k) {
+          var chip = document.querySelector('.filter-chip[data-filter="' + k + '"]');
+          if (chip) { chip.classList.add('is-selected'); chip.setAttribute('aria-pressed', 'true'); }
+        });
+
+        var hasFilter = Object.keys(selected).length > 0 || minSeats !== null;
+        clearBtn.hidden = !hasFilter;
+
+        var list = ROOMS.filter(function (r) {
+          var keys = Object.keys(selected);
+          for (var i = 0; i < keys.length; i++) {
+            if (r.equipment.indexOf(keys[i]) === -1) return false;
+          }
+          if (minSeats !== null && r.seats < minSeats) return false;
+          return true;
+        });
+
+        if (list.length === 0) {
+          grid.innerHTML = '';
+          emptyState.hidden = false;
+          return;
+        }
+        emptyState.hidden = true;
+
+        grid.innerHTML = list.map(function (r, idx) {
+          var equip = r.equipment.length
+            ? r.equipment.map(function (e) { return '<span class="equip-chip">' + e + '</span>'; }).join('')
+            : '<span class="equip-empty">Keine Ausstattung angegeben</span>';
+          return '' +
+            '<article class="room-card" id="room-card-' + idx + '" data-room="' + r.name + '" data-od-id="room-card-' + idx + '">' +
+              '<div class="room-card-head">' +
+                '<h2 class="room-card-name">' + r.name + '</h2>' +
+                '<span class="seats-badge">' + SEAT_ICON + r.seats + ' Plätze</span>' +
+              '</div>' +
+              '<div class="equip-chips">' + equip + '</div>' +
+              '<div class="room-card-foot">' +
+                '<a class="btn btn-secondary btn-sm" href="day-view.html?room=' + encodeURIComponent(r.name) + '">Tag anzeigen</a>' +
+                '<a class="btn btn-primary btn-sm" href="booking.html?room=' + encodeURIComponent(r.name) + '">Buchen</a>' +
+              '</div>' +
+            '</article>';
+        }).join('');
+
+        list.forEach(function (_, idx) { cardClickable('room-card-' + idx); });
+      }
+
+      document.querySelectorAll('.filter-chip').forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          var key = chip.getAttribute('data-filter');
+          if (selected[key]) delete selected[key]; else selected[key] = true;
+          render();
+        });
+      });
+
+      var debounceTimer = null;
+      seatsInput.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function () {
+          var v = seatsInput.value;
+          if (v === '') {
+            minSeats = null;
+            seatsReadout.hidden = true;
+          } else {
+            var n = parseInt(v, 10);
+            if (!isNaN(n) && n >= 1) {
+              minSeats = n;
+              seatsReadout.textContent = '≥ ' + n + (n === 1 ? ' Platz' : ' Plätze');
+              seatsReadout.hidden = false;
+            }
+          }
+          render();
+        }, 200);
+      });
+
+      function clearAll() {
+        selected = {};
+        minSeats = null;
+        seatsInput.value = '';
+        seatsReadout.hidden = true;
+        render();
+      }
+      clearBtn.addEventListener('click', clearAll);
+      emptyClearBtn.addEventListener('click', clearAll);
+
+      render();
+    })();
+  </script>
+</body>
+</html>

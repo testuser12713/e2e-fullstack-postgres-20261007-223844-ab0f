@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neue Buchung — Raumbuchung</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
+        </span>
+        <span class="brand-name">Raumbuchung</span>
+      </a>
+      <nav class="navtabs" aria-label="Hauptnavigation">
+        <a class="navtab" href="index.html">Räume</a>
+        <a class="navtab" href="day-view.html">Tagesansicht</a>
+        <a class="navtab" href="free-rooms.html">Freie Räume</a>
+      </nav>
+      <div class="health" role="status" title="GET /api/health → {&quot;status&quot;:&quot;ok&quot;,&quot;database&quot;:&quot;ok&quot;}">
+        <span class="health-dot"></span>
+        <span class="health-label">API ok</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container page" data-od-id="booking-screen">
+    <div class="page-head" data-od-id="booking-head">
+      <a class="back-link" href="day-view.html">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+        Zurück zur Tagesansicht
+      </a>
+      <h1 class="page-title" data-od-id="booking-title">Neue Buchung</h1>
+      <p class="page-subtitle">Raum und Zeitraum festlegen. Felder mit * sind Pflichtfelder.</p>
+    </div>
+
+    <div class="card form-card" data-od-id="booking-form-card">
+      <div class="conflict-banner banner" id="conflict-banner" hidden role="alert" data-od-id="booking-conflict">
+        <svg class="banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+        <div class="banner-body">
+          <div class="banner-title">Dieser Zeitraum ist bereits vergeben</div>
+          <div class="banner-text" id="conflict-text">Wöchentliches Stand-up von Anna Schmidt, 09:00–10:30 (14.04.2026)</div>
+        </div>
+      </div>
+
+      <form id="booking-form" novalidate>
+        <div class="field">
+          <label class="field-label" for="f-room">Raum <span class="req">*</span></label>
+          <select class="select" id="f-room">
+            <option value="">Bitte wählen</option>
+            <option value="Konferenzraum Nord">Konferenzraum Nord</option>
+            <option value="Besprechung Mitte">Besprechung Mitte</option>
+            <option value="Fokusraum A">Fokusraum A</option>
+            <option value="Kreativ-Lounge">Kreativ-Lounge</option>
+            <option value="Fokusraum B">Fokusraum B</option>
+            <option value="Telefonzelle 1">Telefonzelle 1</option>
+          </select>
+          <div class="field-error" id="err-room" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            <span>Bitte einen Raum wählen.</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="f-title">Titel <span class="req">*</span></label>
+          <input class="input" id="f-title" type="text" placeholder="z. B. Wöchentliches Stand-up">
+          <div class="field-error" id="err-title" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            <span>Titel ist erforderlich.</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="f-by">Gebucht von <span class="req">*</span></label>
+          <input class="input" id="f-by" type="text" placeholder="Vor- und Nachname">
+          <div class="field-error" id="err-by" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            <span>Name ist erforderlich.</span>
+          </div>
+        </div>
+
+        <div class="time-range-group">
+          <div class="field">
+            <label class="field-label" for="f-date">Datum <span class="req">*</span></label>
+            <input class="input num" id="f-date" type="date">
+            <div class="field-error" id="err-date" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+              <span>Datum ist erforderlich.</span>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="f-start">Beginn <span class="req">*</span></label>
+            <input class="input num" id="f-start" type="time" step="300">
+            <div class="field-error" id="err-start" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+              <span>Beginn ist erforderlich.</span>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="f-end">Ende <span class="req">*</span></label>
+            <input class="input num" id="f-end" type="time" step="300">
+            <div class="field-error" id="err-end" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+              <span id="err-end-text">Ende ist erforderlich.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row" style="justify-content: flex-end; gap: 8px; margin-top: 24px;">
+          <a class="btn btn-ghost" href="day-view.html">Abbrechen</a>
+          <button class="btn btn-primary" id="submit-btn" type="submit">Buchen</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var form = document.getElementById('booking-form');
+      var submitBtn = document.getElementById('submit-btn');
+      var conflictBanner = document.getElementById('conflict-banner');
+      var conflictText = document.getElementById('conflict-text');
+
+      var fields = {
+        room: document.getElementById('f-room'),
+        title: document.getElementById('f-title'),
+        by: document.getElementById('f-by'),
+        date: document.getElementById('f-date'),
+        start: document.getElementById('f-start'),
+        end: document.getElementById('f-end')
+      };
+      var errors = {
+        room: document.getElementById('err-room'),
+        title: document.getElementById('err-title'),
+        by: document.getElementById('err-by'),
+        date: document.getElementById('err-date'),
+        start: document.getElementById('err-start'),
+        end: document.getElementById('err-end'),
+        endText: document.getElementById('err-end-text')
+      };
+
+      var attempted = false;
+      var touched = {};
+
+      function toMinutes(t) {
+        if (!t) return null;
+        return (+t.slice(0, 2)) * 60 + (+t.slice(3, 5));
+      }
+
+      function validateField(key) {
+        var el = fields[key];
+        var errEl = errors[key];
+        var v = el.value.trim ? el.value.trim() : el.value;
+        var msg = null;
+
+        if (key === 'room' && !v) msg = 'Bitte einen Raum wählen.';
+        if (key === 'title' && !v) msg = 'Titel ist erforderlich.';
+        if (key === 'by' && !v) msg = 'Name ist erforderlich.';
+        if (key === 'date' && !v) msg = 'Datum ist erforderlich.';
+        if (key === 'start' && !v) msg = 'Beginn ist erforderlich.';
+        if (key === 'end') {
+          if (!v) {
+            msg = 'Ende ist erforderlich.';
+          } else if (fields.start.value && toMinutes(v) <= toMinutes(fields.start.value)) {
+            msg = 'Ende muss nach dem Start liegen.';
+          } else if (fields.start.value) {
+            var diff = toMinutes(v) - toMinutes(fields.start.value);
+            if (diff > 480) msg = 'Eine Buchung darf höchstens 8 Stunden dauern.';
+          }
+        }
+
+        if (msg) {
+          errEl.querySelector('span').textContent = msg;
+          errEl.hidden = false;
+          el.classList.add('error');
+          el.setAttribute('aria-invalid', 'true');
+          el.setAttribute('aria-describedby', errEl.id);
+          return false;
+        }
+        errEl.hidden = true;
+        el.classList.remove('error');
+        el.removeAttribute('aria-invalid');
+        return true;
+      }
+
+      function showIfRelevant(key) {
+        if (attempted || touched[key]) validateField(key);
+      }
+
+      Object.keys(fields).forEach(function (key) {
+        fields[key].addEventListener('blur', function () { touched[key] = true; validateField(key); });
+        fields[key].addEventListener('input', function () {
+          if (attempted || touched[key]) validateField(key);
+          if (attempted) {
+            validateField('end');
+            conflictBanner.hidden = true;
+          }
+        });
+      });
+
+      function overlapsWithConflict() {
+        if (fields.room.value !== 'Konferenzraum Nord') return null;
+        if (fields.date.value !== '2026-04-14') return null;
+        var s = toMinutes(fields.start.value), e = toMinutes(fields.end.value);
+        if (s === null || e === null) return null;
+        var cStart = 540, cEnd = 630; // 09:00–10:30
+        if (e <= cStart || s >= cEnd) return null;
+        return 'Wöchentliches Stand-up von Anna Schmidt, 09:00–10:30 (14.04.2026)';
+      }
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        attempted = true;
+        conflictBanner.hidden = true;
+
+        var ok = true;
+        Object.keys(fields).forEach(function (key) {
+          if (!validateField(key)) ok = false;
+        });
+
+        if (!ok) return;
+
+        var conflict = overlapsWithConflict();
+        if (conflict) {
+          conflictText.textContent = conflict;
+          conflictBanner.hidden = false;
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> Buchen…';
+        setTimeout(function () {
+          window.location.href = 'day-view.html?room=' + encodeURIComponent(fields.room.value) + '&date=' + fields.date.value;
+        }, 500);
+      });
+
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('room')) fields.room.value = params.get('room');
+      if (params.get('date')) fields.date.value = params.get('date');
+    })();
+  </script>
+</body>
+</html>
