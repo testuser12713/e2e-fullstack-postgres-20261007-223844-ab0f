@@ -1,0 +1,36 @@
+{
+  "runcontract": 1,
+  "services": [
+    {
+      "name": "db",
+      "kind": "database",
+      "engine": "postgres"
+    },
+    {
+      "name": "api",
+      "dir": "backend",
+      "stack": "python",
+      "kind": "server",
+      "install": [
+        ["${python}", "-m", "pip", "install", "-q", "-r", "requirements.txt"]
+      ],
+      "start": [
+        "${python}", "-m", "uvicorn", "app.main:app", "--port", "${PORT}"
+      ],
+      "test": [
+        ["${python}", "-m", "pytest"]
+      ],
+      "port": 8000,
+      "port_env": "PORT",
+      "health": {
+        "path": "/api/health",
+        "expect_status": [200]
+      },
+      "depends_on": ["db"],
+      "env": {
+        "DATABASE_URL": { "dev": "${service:db.url}" },
+        "OFFICE_TIMEZONE": { "dev": "Europe/Berlin" }
+      }
+    }
+  ]
+}
