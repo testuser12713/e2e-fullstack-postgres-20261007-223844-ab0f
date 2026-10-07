@@ -54,7 +54,7 @@ describe('App shell navigation', () => {
 
   it('renders the booking form route inside the shell', () => {
     renderApp('/rooms/1/bookings/new')
-    expect(screen.getByRole('heading', { name: 'Booking' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Neue Buchung' })).toBeInTheDocument()
     expect(screen.getByRole('navigation', { name: /main navigation/i })).toBeInTheDocument()
   })
 })
